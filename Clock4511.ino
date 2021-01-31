@@ -1,29 +1,33 @@
-#include "Button.h"
 #include "Cd4511.h"
 #include <RTClock.h>
 
-Button* butt = new Button(13);
 RTClock rtclock (RTCSEL_LSE); // initialise
-Cd4511* digit0 = new Cd4511(PB8,PB7,PB6,PB9); //7 oposite !!
-Cd4511* digit1 = new Cd4511(PB10,PB11,PB12,PB13); 
-Cd4511* digit2 = new Cd4511(PB0,PB1,PB2,PB3);
-Cd4511* digit3 = new Cd4511(PA0,PA1,PA2,PA3);
-uint8_t num = 0;
-void setup() {
-  rtclock.setTime(0);
-  rtclock.attachSecondsInterrupt(secondTrigger);// Call SecondCount
-  pinMode(LED_BUILTIN, OUTPUT);
-}
+tm_t mtt;
 
-// the loop function runs over and over again forever
-void loop() {
-  uint32_t time = rtclock.getTime();
-}
+Cd4511* digit0 = new Cd4511(PB8,PB7,PB6,PB9); //IDE
+Cd4511* digit1 = new Cd4511(PB4,PB3,PA15,PB5);
+Cd4511* digit2 = new Cd4511(PB14,PB13,PB12,PB15); //IDE
+Cd4511* digit3 = new Cd4511(PA10,PA9,PA8,PA11); //IDE
 
-void secondTrigger()
+
+void setup() 
 {
-  digit0->display(num);
-    ++num;
-  if(10 == num)
-    num = 0;
+   rtclock.setTime(0);   
+}
+
+void loop() 
+{
+  rtclock.attachSecondsInterrupt(trigerSecond);// Call blink
+}
+
+void trigerSecond()
+{
+  rtclock.getTime(mtt);
+  uint32_t second = mtt.second;
+  uint32_t sec0 = second % 10;
+  uint32_t sec1 = (second / 10) % 10;
+  digit3->display(sec0);
+  digit0->display(sec1);
+  digit2->display(3);
+  digit1->display(3);
 }
